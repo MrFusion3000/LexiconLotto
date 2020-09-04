@@ -8,32 +8,42 @@ namespace LexiconLotto
     {
         static void Main(string[] args)
         {
-            int i = 1;
+            //int i = 1;
             ArrayList lottoRader = new ArrayList();
+            string getInput = " ";
 
             // [ ]  Mata in valfritt antal rader för valfritt antal användare
             Console.WriteLine("Välkommen till LOTTO2000 - vinn stort, virtuellt!");
 
-            while (i != 0)
+            while (getInput != "")
             {
                 Console.WriteLine("Ange din lottorad (Namn,N1,N2,N3,N4,N5,N6,N7): ");
 
-                string getInput = Console.ReadLine();
+                getInput = Console.ReadLine();
 
-                if (getInput == "")     // get out of while loop if <return>
-                { 
-                    i = 0; 
+                if (getInput != "")     // get out of while loop if <return>
+                {
+                var checkIt = StripName(getInput);     // Check if numbers are in range (1-35)
+
+                    if (checkIt.Item1 == true)
+                    {
+                    lottoRader.Add(getInput);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Raden innehåller ej valbara nummer!");
+                    }
                 }
-
-                lottoRader.Add (getInput);
-
-                //Console.WriteLine("   {0}", getInput);
-
-                //getInput = CheckLottoNumbers(getInput);
+                //Console.WriteLine("   {0}", getInput);          
             }
 
-            PrintValues(lottoRader);
-
+            foreach (string rad in lottoRader)
+            {
+                // *** debug
+                Console.Write("   {0}", rad);
+                Console.WriteLine();
+                // debug end ***
+            }
 
 
             // [ ]  Avbryt vid tom rad(endast<Enter>
@@ -51,7 +61,7 @@ namespace LexiconLotto
         }
 
         // Sorterar bort namnt från textsträngen och lämnar talen
-        public static ArrayList PrintValues(IEnumerable myList)
+        public static ArrayList CheckValues(IEnumerable myList)
         {
             string lottoRowName;
             string lottoRowNoName;
@@ -72,37 +82,28 @@ namespace LexiconLotto
             return lottoRaderStripped;
         }
 
-        // **** Kontroll av godkända tecken och blockering av annat än siffror ****
-        public int Check_Valid(int _antalMenyval)
+        public static Tuple<bool, int[]> StripName(string _getInput)
         {
-            int antalMenyval = _antalMenyval;
-            int _menyVal;
-            while (!int.TryParse(Console.ReadLine(), out _menyVal))
-            {
-                Console.WriteLine("Endast något av menyvalen 0 - " + (antalMenyval--) + " är giltiga.");
-            }
-            return _menyVal;
-        }   // **** End Check_Valid() ****
-
-        public string CheckLottoNumbers(string _getInput)
-        {
-            int countNumbers = 0;
             string getInput = _getInput;
-            string[] correctFormat = getInput.Split(",");
-            ArrayList numbersToSort = new ArrayList() ;
+            string lottoRowNoName;
+
+            lottoRowNoName = getInput.Substring(getInput.IndexOf(",") + 1);
+
+            string[] correctFormat = lottoRowNoName.Split(",");
+            int[] numbersToCheck = new int[7];
             int j = 0;
-            
+
             foreach (string input in correctFormat)
             {
-                numbersToSort[j] = Convert.ToInt32(input);
+                numbersToCheck[j] = Convert.ToInt32(input);
 
-                if (countNumbers >= 1 && countNumbers <= 35)
-                { 
-                
+                if (numbersToCheck[j] <= 0 | numbersToCheck[j] >= 36)
+                {
+                    return new Tuple<bool, int[]> (false, numbersToCheck);
                 }
                 j++;
             }
-            return getInput;
+            return new Tuple<bool, int[]> (true, numbersToCheck);
         }
 
         static string CleanInput(string strIn)
